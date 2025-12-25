@@ -202,26 +202,6 @@ while [ $attempt -le 4 ]; do
 done
 ```
 
-## How It Works
-
-### Distribution Algorithm
-
-Tests are distributed across nodes using **round-robin** assignment:
-
-1. Find all test files matching the glob patterns
-2. Process patterns in order (first pattern claims matching files)
-3. Distribute unclaimed files to nodes: `nodeIndex = fileIndex % nodeCount`
-4. Write each node's test files to its testplan file
-
-### Pattern Priority
-
-Glob patterns are processed **in order**. Once a file is claimed by a pattern, it won't be claimed again. This allows you to:
-
-- Group related tests together on the same nodes
-- Ensure specific test categories are evenly distributed first
-- Use a catchall pattern last to pick up any remaining tests
-
-
 ## Tips
 
 - Add `.bun-test-plan/` to your `.gitignore`, they are generated prior to running tests.
