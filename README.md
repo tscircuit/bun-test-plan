@@ -48,6 +48,14 @@ Configure test plan generation with `bun-test-plan.json` in your project root:
     "tests/repros/**/*.test.tsx",
     "tests/examples/**/*.test.tsx",
     "tests/**/*.test.{ts,tsx}"
+  ],
+  // Optional: Specify globs for specific nodes, these globs are guaranteed to run on your specificed node
+  "nodes": [
+    {
+      "nodeIndex": 0,
+      "name": "Bug Reports 0-9",
+      "globPatterns": ["tests/bugreports/bugreport0*.test.tsx"]
+    }
   ]
 }
 ```
@@ -108,30 +116,7 @@ jobs:
           fi
 
           echo "Running ${#test_files[@]} test files for node ${{ matrix.node }}"
-
-          # Retry logic for segfaults and illegal instructions
-          attempt=1
-          while [ $attempt -le 4 ]; do
-            bun test ${test_files[@]} --timeout 30000
-            code=$?
-
-            if [ $code -eq 0 ]; then
-              break
-            fi
-
-            # Exit codes: 139 = segfault, 132 = illegal instruction
-            if [ $code -ne 139 ] && [ $code -ne 132 ]; then
-              exit $code
-            fi
-
-            if [ $attempt -eq 4 ]; then
-              echo "Segmentation fault or illegal instruction detected after $attempt attempts (exit=$code)."
-              exit $code
-            fi
-
-            attempt=$((attempt + 1))
-            echo "Segfault (139) or illegal instruction (132) detected, retrying ($attempt/4)..."
-          done
+          bun test ${test_files[@]}
 
       - name: Upload Snapshot Artifacts on Failure
         if: failure()
@@ -157,7 +142,7 @@ tests/examples/basic-circuit.test.tsx
 
 ## Run Script Example
 
-Each `run-tests-node{N}.sh` script handles test execution with retry logic:
+Each `run-tests-node{N}.sh` script handles test execution:
 
 ```bash
 #!/usr/bin/env bash
@@ -177,33 +162,10 @@ if [ ${#test_files[@]} -eq 0 ]; then
 fi
 
 echo "Running ${#test_files[@]} test files..."
-
-attempt=1
-while [ $attempt -le 4 ]; do
-  bun test ${test_files[@]} --timeout 30000
-  code=$?
-
-  if [ $code -eq 0 ]; then
-    exit 0
-  fi
-
-  # Retry only on segfault (139) or illegal instruction (132)
-  if [ $code -ne 139 ] && [ $code -ne 132 ]; then
-    exit $code
-  fi
-
-  if [ $attempt -eq 4 ]; then
-    echo "Failed after $attempt attempts (exit=$code)"
-    exit $code
-  fi
-
-  attempt=$((attempt + 1))
-  echo "Retrying ($attempt/4)..."
-done
+bun test ${test_files[@]}
 ```
 
 ## Tips
 
 - Add `.bun-test-plan/` to your `.gitignore`, they are generated prior to running tests.
-- Always include a catchall pattern like `tests/**/*.test.{ts,tsx}` as the last pattern
 - Adjust `nodeCount` based on your CI runner capacity and test suite size
