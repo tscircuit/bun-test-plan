@@ -1,6 +1,6 @@
 {
   "name": "@tscircuit/bun-test-plan",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Generate test plans for parallel CI execution with bun test",
   "type": "module",
   "main": "./dist/index.js",
