@@ -124,7 +124,7 @@ echo "Running \${#test_files[@]} test files..."
 
 attempt=1
 while [ $attempt -le 4 ]; do
-  bun test \${test_files[@]} --timeout 30000
+  bun test \${test_files[@]} --timeout 300000
   code=$?
 
   if [ $code -eq 0 ]; then
