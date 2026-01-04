@@ -3,24 +3,25 @@
   "version": "0.0.1",
   "description": "Generate test plans for parallel CI execution with bun test",
   "type": "module",
-  "main": "./src/index.ts",
-  "module": "./src/index.ts",
-  "types": "./src/index.ts",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "bin": {
-    "bun-test-plan": "./src/cli.ts"
+    "bun-test-plan": "./dist/cli.js"
   },
   "exports": {
     ".": {
-      "import": "./src/index.ts",
-      "types": "./src/index.ts"
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
     }
   },
   "scripts": {
+    "build": "tsup ./src/index.ts ./src/cli.ts --format esm --dts --sourcemap --external bun",
     "format": "biome format --write .",
     "format:check": "biome format ."
   },
   "files": [
-    "src"
+    "dist"
   ],
   "keywords": [
     "bun",
@@ -38,7 +39,8 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.10",
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "tsup": "^8.5.1"
   },
   "peerDependencies": {
     "typescript": "^5"
